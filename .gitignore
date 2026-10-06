@@ -18,13 +18,9 @@ env/
 ehthumbs.db
 Thumbs.db
 
-# Large data files and downloaded image caches
-data/**/images/
-data/**/*.jpg
-data/**/*.jpeg
-data/**/*.png
-data/**/records.csv
-blur-tests/
+# Data and development archive (use sample_data/ for public repository)
+data/
+archive/
 
 # Large visual artifacts & PDFs (>50MB)
 *.pdf

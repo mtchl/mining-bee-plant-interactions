@@ -72,12 +72,19 @@ pip install -r requirements.txt
 
 A unified CLI runner is provided via `run_pipeline.py`.
 
-### 1. Run Complete Pipeline End-to-End
+### 1. Run the Demo Pipeline (with Sample Data)
+The repository includes `sample_data/records.csv` (50 representative occurrences across 15 native and introduced bee genera). You can run a self-contained test of the entire pipeline end-to-end:
+
+```bash
+python run_pipeline.py all --csv-path sample_data/records.csv --output-dir sample_data/demo --limit 5
+```
+
+### 2. Run Full Pipeline End-to-End
 ```bash
 python run_pipeline.py all --csv-path data/SEHbees/records.csv --output-dir data/SEHbees
 ```
 
-### 2. Run Individual Steps
+### 3. Run Individual Steps
 
 #### Step 1: Harvest Images & Build Manifest
 ```bash
@@ -179,10 +186,10 @@ Darwin Core and FAIR-aligned format suitable for ecological research, GIS mappin
 │   └── export.py               # Step 4: UI & Public dataset exporter
 ├── models/
 │   └── plant_filter_svm.joblib # Calibrated Linear SVM model weights (537 KB)
-├── sample_data/                # Minimal sample dataset (5 images + manifest) for testing
+├── sample_data/                # Minimal sample dataset (50-row records.csv + pre-harvested demo images)
 ├── run_pipeline.py             # Main CLI entrypoint
 ├── requirements.txt            # Python dependencies
-├── .gitignore                  # Git exclusions for large images, datasets, and caches
+├── .gitignore                  # Git exclusions for large images, datasets, and archive/
 └── README.md
 ```
 
