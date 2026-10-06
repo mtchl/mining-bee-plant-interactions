@@ -1,0 +1,25 @@
+# Core Machine Learning & Deep Learning
+torch
+torchvision
+megadetector
+
+# BioCLIP & Species Classification
+pybioclip
+open_clip_torch
+
+# Image Processing & Computer Vision
+pillow
+numpy
+opencv-python-headless
+
+# Data Handling & Analysis
+pandas
+pyyaml
+scikit-learn
+joblib
+
+# Utilities
+tqdm
+requests
+matplotlib
+

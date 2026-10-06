@@ -1,0 +1,45 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+env/
+
+# Operating system files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Large data files and downloaded image caches
+data/**/images/
+data/**/*.jpg
+data/**/*.jpeg
+data/**/*.png
+data/**/records.csv
+blur-tests/
+
+# Large visual artifacts & PDFs (>50MB)
+*.pdf
+outputs/*.png
+outputs/*.pdf
+outputs/*.svg
+outputs/seh-truncated.png
+outputs/Stream-uniquecols-wider.pdf
+tobias_smith_*.pdf
+
+# Editor / IDE settings
+.vscode/
+.idea/
+
+# Node / UI dev build files if retained in subfolders
+node_modules/
+dist/
+.vite/

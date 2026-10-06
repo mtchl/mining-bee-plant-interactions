@@ -1,0 +1,72 @@
+[
+  {
+    "dataResourceName": "ClimateWatch",
+    "identifiedBy": "",
+    "occurrenceID": "18258d3a-219e-41a2-93ae-b4912134a805",
+    "scientificName": "Apis (Apis) mellifera",
+    "genus": "Apis",
+    "family": "Apidae",
+    "imageID": "7f858a9f-0bf2-4702-a1d5-468ac9bde2a3",
+    "decimalLatitude": "-37.798965",
+    "decimalLongitude": "145.580453",
+    "eventDate": "2014-09-15T04:39:00Z",
+    "originalImagesField": "https://images.ala.org.au/image/7f858a9f-0bf2-4702-a1d5-468ac9bde2a3",
+    "localPath": "data/SEHbees/images/7f858a9f-0bf2-4702-a1d5-468ac9bde2a3.jpg"
+  },
+  {
+    "dataResourceName": "ClimateWatch",
+    "identifiedBy": "",
+    "occurrenceID": "72002d82-aab9-48b6-a2b2-0299085c8da5",
+    "scientificName": "Apis (Apis) mellifera",
+    "genus": "Apis",
+    "family": "Apidae",
+    "imageID": "3976da4a-71cd-4115-ac3b-6585c631f922",
+    "decimalLatitude": "-37.798965",
+    "decimalLongitude": "145.580453",
+    "eventDate": "2014-09-28T01:19:00Z",
+    "originalImagesField": "https://images.ala.org.au/image/3976da4a-71cd-4115-ac3b-6585c631f922",
+    "localPath": "data/SEHbees/images/3976da4a-71cd-4115-ac3b-6585c631f922.jpg"
+  },
+  {
+    "dataResourceName": "ClimateWatch",
+    "identifiedBy": "",
+    "occurrenceID": "17f2f1cc-1e7f-4ef4-9de1-feaf27281612",
+    "scientificName": "Apis (Apis) mellifera",
+    "genus": "Apis",
+    "family": "Apidae",
+    "imageID": "ffc8a4a5-38f7-48c2-9d36-de927047d5e3",
+    "decimalLatitude": "-37.966141",
+    "decimalLongitude": "145.321922",
+    "eventDate": "2014-10-04T00:47:01Z",
+    "originalImagesField": "https://images.ala.org.au/image/ffc8a4a5-38f7-48c2-9d36-de927047d5e3",
+    "localPath": "data/SEHbees/images/ffc8a4a5-38f7-48c2-9d36-de927047d5e3.jpg"
+  },
+  {
+    "dataResourceName": "ClimateWatch",
+    "identifiedBy": "",
+    "occurrenceID": "1440e3ef-4904-4f79-a10d-2e2dc231b578",
+    "scientificName": "Apis (Apis) mellifera",
+    "genus": "Apis",
+    "family": "Apidae",
+    "imageID": "83798ae2-036d-483a-a982-90fd975969af",
+    "decimalLatitude": "-37.965093",
+    "decimalLongitude": "145.318917",
+    "eventDate": "2014-08-28T06:04:56Z",
+    "originalImagesField": "https://images.ala.org.au/image/83798ae2-036d-483a-a982-90fd975969af",
+    "localPath": "data/SEHbees/images/83798ae2-036d-483a-a982-90fd975969af.jpg"
+  },
+  {
+    "dataResourceName": "ClimateWatch",
+    "identifiedBy": "",
+    "occurrenceID": "02a83baa-b5ad-4437-95f2-2c17f828a5fa",
+    "scientificName": "Apis (Apis) mellifera",
+    "genus": "Apis",
+    "family": "Apidae",
+    "imageID": "1983db39-ad4b-4643-96c2-e3c00eb6d976",
+    "decimalLatitude": "-35.275494",
+    "decimalLongitude": "149.121407",
+    "eventDate": "2014-05-01T05:15:36Z",
+    "originalImagesField": "https://images.ala.org.au/image/1983db39-ad4b-4643-96c2-e3c00eb6d976",
+    "localPath": "data/SEHbees/images/1983db39-ad4b-4643-96c2-e3c00eb6d976.jpg"
+  }
+]
