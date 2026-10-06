@@ -53,12 +53,14 @@ def main():
     p_export = subparsers.add_parser("export", help="Step 4: Export clean UI and public research datasets")
     p_export.add_argument("--input-json", default="data/SEHbees/detections-genus-annotated.json", help="Input annotated JSON")
     p_export.add_argument("--output-dir", default="data/SEHbees", help="Output directory")
-    p_export.add_argument("--decimals", type=int, default=4, help="Float decimal precision")
+    p_export.add_argument("--min-confidence", type=float, default=0.4, help="Minimum plant detection score for UI export (default: 0.4)")
+    p_export.add_argument("--decimals", type=int, default=4, help="Float decimal precision (default: 4)")
 
     # All steps
     p_all = subparsers.add_parser("all", help="Run entire pipeline end-to-end")
     p_all.add_argument("--csv-path", default="data/SEHbees/records.csv", help="Path to ALA occurrences CSV")
     p_all.add_argument("--output-dir", default="data/SEHbees", help="Output root directory")
+    p_all.add_argument("--min-confidence", type=float, default=0.4, help="Minimum plant detection score for UI export (default: 0.4)")
     p_all.add_argument("--limit", type=int, default=None, help="Limit number of records processed")
 
     args = parser.parse_args()
@@ -93,7 +95,12 @@ def main():
 
     elif args.command == "export":
         from pipeline.export import export_clean_datasets
-        export_clean_datasets(args.input_json, args.output_dir, round_decimals=args.decimals)
+        export_clean_datasets(
+            args.input_json,
+            args.output_dir,
+            min_confidence=args.min_confidence,
+            round_decimals=args.decimals
+        )
 
     elif args.command == "all":
         out_base = Path(args.output_dir)
@@ -126,7 +133,11 @@ def main():
 
         print("\n=== Step 4: Exporting Clean UI & Public Formats ===")
         from pipeline.export import export_clean_datasets
-        export_clean_datasets(str(annotated_path), str(out_base))
+        export_clean_datasets(
+            str(annotated_path),
+            str(out_base),
+            min_confidence=args.min_confidence
+        )
 
         print("\nPipeline execution completed successfully!")
 

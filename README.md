@@ -112,6 +112,7 @@ python run_pipeline.py classify \
 python run_pipeline.py export \
   --input-json data/SEHbees/detections-genus-annotated.json \
   --output-dir data/SEHbees \
+  --min-confidence 0.4 \
   --decimals 4
 ```
 
@@ -119,8 +120,8 @@ python run_pipeline.py export \
 
 ## Data Output Formats & Data Dictionary
 
-### 1. Web UI Deliverables (`detections-ui.json` / `detections-ui-plants-only.json`)
-Engineered for client-side web applications. All local paths, redundant arrays, and unused spatial coordinates are stripped. Floating-point confidence values are rounded to 4 decimals:
+### 1. Web UI Deliverable (`detections-ui.json`)
+Engineered specifically for client-side web applications. Automatically filtered to plant detections with prediction confidence $> 0.4$ (configurable via `--min-confidence`). All local paths, redundant arrays, and unused spatial coordinates are stripped, and floating-point confidence values are rounded to 4 decimals (reducing file size from ~14 MB to **~1.6 MB**):
 
 ```json
 {

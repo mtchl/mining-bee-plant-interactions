@@ -3,10 +3,11 @@
 Pipeline Step 4: Export Clean Datasets for Web UI and Public Research Reuse.
 
 Generates:
-1. detections-ui.json: Lightweight client-side JSON (stripped of unused/redundant fields).
-2. detections-ui-plants-only.json: Compact interaction-only JSON for high-performance web loading.
-3. detections-public.json: Research-grade JSON with spatial coordinates and provenance.
-4. detections-public.csv: Flat tabular CSV ready for R, Pandas, QGIS, and Darwin Core workflows.
+1. detections-ui.json: Lightweight client-side JSON filtered strictly to plant detections
+   with confidence > threshold (default: > 0.4), with unused/redundant fields removed.
+2. detections-public.json: Complete research-grade JSON with spatial coordinates, provenance,
+   and audit metrics (all observations).
+3. detections-public.csv: Complete flat tabular CSV ready for R, Pandas, QGIS, and Darwin Core.
 """
 
 import argparse
@@ -15,8 +16,22 @@ import json
 from pathlib import Path
 
 
-def export_clean_datasets(input_path: str, output_dir: str, round_decimals: int = 4):
-    """Transform raw pipeline detections into optimized UI and public release formats."""
+def export_clean_datasets(
+    input_path: str,
+    output_dir: str,
+    min_confidence: float = 0.4,
+    round_decimals: int = 4
+):
+    """
+    Transform raw pipeline detections into optimized UI and public release formats.
+
+    Args:
+        input_path: Path to detections-genus-annotated.json.
+        output_dir: Directory where exported files will be written.
+        min_confidence: Minimum plant detection confidence score (> threshold)
+                        to include in detections-ui.json (default: 0.4).
+        round_decimals: Number of decimal places to round confidence scores.
+    """
     in_file = Path(input_path)
     out_dir = Path(output_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -28,15 +43,14 @@ def export_clean_datasets(input_path: str, output_dir: str, round_decimals: int 
     with open(in_file, 'r', encoding='utf-8') as f:
         records = json.load(f)
 
-    ui_full = []
-    ui_plants_only = []
+    ui_records = []
     public_records = []
 
     for item in records:
         pd = item.get('plantDetection')
         has_plant = bool(item.get('hasPlant', False))
 
-        # Standardize plantDetection object
+        # Standardize clean plantDetection object
         clean_pd = None
         if pd and has_plant:
             clean_pd = {
@@ -45,25 +59,25 @@ def export_clean_datasets(input_path: str, output_dir: str, round_decimals: int 
                 "nativeStatus": round(float(pd["nativeStatus"]), round_decimals) if pd.get("nativeStatus") is not None else None
             }
 
-        # 1. Web UI format (no coordinates, no local paths, no redundant arrays)
-        ui_rec = {
-            "occurrenceID": item.get("occurrenceID", ""),
-            "scientificName": item.get("scientificName", ""),
-            "genus": item.get("genus", ""),
-            "family": item.get("family", ""),
-            "imageID": item.get("imageID", ""),
-            "eventDate": item.get("eventDate", ""),
-            "dataResourceName": item.get("dataResourceName", ""),
-            "identifiedBy": item.get("identifiedBy", ""),
-            "hasPlant": has_plant,
-            "plantConfidence": round(float(item["plantConfidence"]), round_decimals) if item.get("plantConfidence") is not None else None,
-            "plantDetection": clean_pd
-        }
-        ui_full.append(ui_rec)
-        if has_plant and clean_pd:
-            ui_plants_only.append(ui_rec)
+        # 1. Web UI format:
+        # Filter ONLY plant detections exceeding the confidence threshold
+        if has_plant and clean_pd and clean_pd.get("score") is not None and clean_pd["score"] > min_confidence:
+            ui_rec = {
+                "occurrenceID": item.get("occurrenceID", ""),
+                "scientificName": item.get("scientificName", ""),
+                "genus": item.get("genus", ""),
+                "family": item.get("family", ""),
+                "imageID": item.get("imageID", ""),
+                "eventDate": item.get("eventDate", ""),
+                "dataResourceName": item.get("dataResourceName", ""),
+                "identifiedBy": item.get("identifiedBy", ""),
+                "hasPlant": True,
+                "plantConfidence": round(float(item["plantConfidence"]), round_decimals) if item.get("plantConfidence") is not None else None,
+                "plantDetection": clean_pd
+            }
+            ui_records.append(ui_rec)
 
-        # 2. Public Research format (spatial coordinates, canonical image URLs, audit metrics)
+        # 2. Public Research format (complete dataset with coordinates, canonical image URLs, audit metrics)
         lat = float(item["decimalLatitude"]) if item.get("decimalLatitude") and item["decimalLatitude"] != "" else None
         lon = float(item["decimalLongitude"]) if item.get("decimalLongitude") and item["decimalLongitude"] != "" else None
         img_id = item.get("imageID", "")
@@ -90,15 +104,15 @@ def export_clean_datasets(input_path: str, output_dir: str, round_decimals: int 
         }
         public_records.append(pub_rec)
 
-    # Save UI Full
-    ui_full_path = out_dir / "detections-ui.json"
-    with open(ui_full_path, 'w', encoding='utf-8') as f:
-        json.dump(ui_full, f, indent=2)
+    # Save unified UI JSON (filtered to plant detections > threshold)
+    ui_path = out_dir / "detections-ui.json"
+    with open(ui_path, 'w', encoding='utf-8') as f:
+        json.dump(ui_records, f, indent=2)
 
-    # Save UI Plants-Only
-    ui_plants_path = out_dir / "detections-ui-plants-only.json"
-    with open(ui_plants_path, 'w', encoding='utf-8') as f:
-        json.dump(ui_plants_only, f, indent=2)
+    # Clean up deprecated detections-ui-plants-only.json if present
+    deprecated_ui_plants = out_dir / "detections-ui-plants-only.json"
+    if deprecated_ui_plants.exists():
+        deprecated_ui_plants.unlink()
 
     # Save Public JSON
     pub_json_path = out_dir / "detections-public.json"
@@ -113,21 +127,26 @@ def export_clean_datasets(input_path: str, output_dir: str, round_decimals: int 
         writer.writeheader()
         writer.writerows(public_records)
 
-    print(f"\nExport complete for {len(records)} records:")
-    print(f"  - Web UI (Full):           {ui_full_path} ({len(ui_full)} records)")
-    print(f"  - Web UI (Plant-Positive): {ui_plants_path} ({len(ui_plants_only)} records)")
-    print(f"  - Public Research JSON:    {pub_json_path} ({len(public_records)} records)")
-    print(f"  - Public Research CSV:     {pub_csv_path} ({len(public_records)} rows)")
+    print(f"\nExport complete from {len(records)} source records:")
+    print(f"  - Web UI (Unified, plant confidence > {min_confidence}): {ui_path} ({len(ui_records)} records)")
+    print(f"  - Public Research JSON (All records):             {pub_json_path} ({len(public_records)} records)")
+    print(f"  - Public Research CSV (All rows):                {pub_csv_path} ({len(public_records)} rows)")
 
 
 def main():
     parser = argparse.ArgumentParser(description="Export clean UI and public research datasets.")
     parser.add_argument("--input-json", default="data/SEHbees/detections-genus-annotated.json", help="Path to input annotated JSON")
     parser.add_argument("--output-dir", default="data/SEHbees", help="Output directory for generated datasets")
-    parser.add_argument("--decimals", type=int, default=4, help="Decimal rounding precision for float scores")
+    parser.add_argument("--min-confidence", type=float, default=0.4, help="Minimum plant detection score for UI export (default: 0.4)")
+    parser.add_argument("--decimals", type=int, default=4, help="Decimal rounding precision for float scores (default: 4)")
     args = parser.parse_args()
 
-    export_clean_datasets(args.input_json, args.output_dir, round_decimals=args.decimals)
+    export_clean_datasets(
+        args.input_json,
+        args.output_dir,
+        min_confidence=args.min_confidence,
+        round_decimals=args.decimals
+    )
 
 
 if __name__ == "__main__":
