@@ -13,38 +13,19 @@ Experimental data-mining of bee-plant interactions (visitation) from biodiversit
 
 ## Pipeline Overview
 
-1. **Harvesting:** Downloads occurrence images from the Atlas of Living Australia (one image per record).
-2. **Localization:** Detects animal/bee bounding boxes using MegaDetector (MDV5A).
-3. **Redaction, Filtering & Classification:** Blurs insect bounding boxes to prevent visual interference, filters out images without a plant in frame, and classifies plant genus with BioCLIP. Optionally, queries the ALA's `establishmentMeans` field to estimate whether the plant genus is native.
-4. **Data Export:** Produces lightweight client-side data for web interfaces and tabular datasets for other applications.
-
-### Pipeline Stages
+1. **Harvesting (`pipeline/harvest.py`):** Downloads occurrence images from the Atlas of Living Australia (one image per record).
+2. **Localization (`pipeline/detect_bees.py`):** Detects animal/bee bounding boxes using MegaDetector (MDV5A), saves bounding box data.
+3. **Redaction, Filtering & Classification (`pipeline/classify_plants.py`):** Blurs insect bounding boxes to prevent visual interference, filters out images without a plant in frame, and classifies plant genus with BioCLIP. Optionally, queries the ALA's `establishmentMeans` field to estimate whether the plant genus is native.
+4. **Data Export (`pipeline/export.py`):** Produces lightweight, high-confidence data for web interfaces and unfiltered tabular data for other applications.
 
 
-2. **Insect Localization (`pipeline/detect_bees.py`)**  
-   Uses **MegaDetector (MDV5A)** batch inference to locate animals/insects within each photograph and save normalized bounding box coordinates.
-
-3. **Insect Redaction, Plant Filtering & Classification (`pipeline/classify_plants.py`)**  
-   - **Adaptive Bounding Box Redaction:** Filters out low-confidence detections ($< 0.25$) and oversized boxes ($> 0.50$ of image area), then applies an adaptive Gaussian blur proportional to box dimensions.
-   - **SVM Plant Gate:** Extracts normalized BioCLIP visual embeddings and evaluates a calibrated Linear SVM pre-filter. If the probability of an identifiable floral plant in frame is $< 0.30$, genus classification is skipped to eliminate false positive plant hallucinations.
-   - **BioCLIP Genus Classification:** Passes plant-positive blurred images through `TreeOfLifeClassifier` constrained to `Kingdom: Plantae` at `Rank.GENUS` ($k=1$).
-   - **ALA Nativeness Annotation:** Queries the ALA `establishmentMeans` facet for the top plant genus with caching to compute the empirical native ratio in Australia:
-     $$\text{nativeStatus} = \frac{N_{\text{native}}}{N_{\text{native}} + N_{\text{introduced}}}$$
-
-4. **Dual-Mode Data Export (`pipeline/export.py`)**  
-   Produces separate, optimized deliverables for client-side web interfaces and open-science research reuse.
-
----
-
-## Key Development Insights & Design Rationale
-
-The architecture of this pipeline directly reflects findings and challenges identified during empirical evaluation:
+## Lessons Learned
 
 1. **Insect Redaction Improves Plant Identification Accuracy**  
-   BioCLIP's Tree of Life foundation model is effective at identifying botanical subjects when constrained by a taxonomic filter (`Kingdom: Plantae`). However, strong foreground visual signals from the insect—such as wing venation, dark bodies, or setae—frequently dominate the embedding and distort classification. Localizing the bee with MegaDetector and applying an adaptive Gaussian blur suppresses insect features while preserving the surrounding floral substrate, markedly improving plant genus accuracy.
+   BioCLIP 2 is effective at identifying plants when constrained by a taxonomic filter (`Kingdom: Plantae`). But visual signals from the insect can dominate the embedding and distort classification. Localizing the bee with MegaDetector and applying a   Gaussian blur removes insect visual features and improves plant ID accuracy.
 
 2. **Pre-Filtering Prevents Semantic Hallucinations on Non-Plant Frames**  
-   When a photograph depicts a bee on bare ground, artificial surfaces, a hand, or in flight, constraining BioCLIP to `Kingdom: Plantae` forces the model to select the nearest plant taxon. This causes systematic false positive hallucinations—notably the orchid genus *Stelis* (triggered by nomenclatural and semantic overlap with the cuckoo bee genus *Stelis* in multi-modal training data) or *Tetradium* on bees against neutral backgrounds. A calibrated Linear SVM trained on BioCLIP visual embeddings functions as a gatekeeper, weeding out non-plant frames before taxonomic classification occurs.
+   When an occurrence record depicts a bee without a visible plant, constraining BioCLIP to `Kingdom: Plantae` forces the model to select the nearest plant taxon. This causes false positives due to visual or semantic collisions in BioCLIP. False IDs include the orchid genus *Stelis* (which collides with the bee genus *Stelis* as well as images of observers' hands and fingers) or *Tetradium* (the 'bee bee' tree). To filter out non-plant images a linear classifier was trained on the BioCLIP embeddings for 200 hand-labelled images.
 
 3. **Genus-Level Classification Strikes the Optimal Balance**  
    Attempting species-level classification across wild, uncurated field photography resulted in excessive uncertainty and severe bias toward dominant species in the training distribution. Conversely, family-level identification was too coarse to reveal ecologically informative host associations. Classifying plants to **genus level** provides the ideal balance between morphological distinctiveness, classification accuracy, and ecological granularity for Australian flora.
