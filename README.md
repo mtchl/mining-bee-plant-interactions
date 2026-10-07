@@ -175,26 +175,6 @@ Compact data for client-side web applications. Automatically filtered to plant d
 
 ---
 
-## Repository Structure
-
-```
-├── pipeline/                   # Modular pipeline package
-│   ├── __init__.py
-│   ├── harvest.py              # Step 1: ALA Harvester
-│   ├── detect_bees.py          # Step 2: MegaDetector batch detector
-│   ├── classify_plants.py      # Step 3: Redaction, SVM gate, BioCLIP classifier
-│   └── export.py               # Step 4: UI & Public dataset exporter
-├── models/
-│   └── plant_filter_svm.joblib # Calibrated Linear SVM model weights (537 KB)
-├── sample_data/                # Minimal sample dataset (50-row records.csv + pre-harvested demo images)
-├── run_pipeline.py             # Main CLI entrypoint
-├── requirements.txt            # Python dependencies
-├── .gitignore                  # Git exclusions for large images, datasets, and archive/
-└── README.md
-```
-
----
-
 ## Citations & Acknowledgments
 
 - **Atlas of Living Australia (ALA)**: Biodiversity data and images provided under Creative Commons licensing.
