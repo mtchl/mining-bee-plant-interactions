@@ -106,6 +106,17 @@ python run_pipeline.py export \
   --decimals 4
 ```
 
+#### Training a Custom Plant Filter (Optional)
+The pre-trained model in `models/plant_filter_svm.joblib` was calibrated on Australian bee observations. If you adapt this pipeline to other insect groups (e.g. butterflies, hoverflies) or different photography environments, you can train a domain-specific Linear SVM filter using two folders:
+
+```bash
+python run_pipeline.py train-filter \
+  --positive-dir path/to/images_with_plants \
+  --negative-dir path/to/images_without_plants \
+  --output models/custom_plant_filter.joblib
+```
+*(~50–100 images per folder are sufficient, as BioCLIP visual embeddings are linearly separable.)*
+
 ---
 
 ## Data Output Formats & Data Dictionary

@@ -56,6 +56,14 @@ def main():
     p_export.add_argument("--min-confidence", type=float, default=0.4, help="Minimum plant detection score for UI export (default: 0.4)")
     p_export.add_argument("--decimals", type=int, default=4, help="Float decimal precision (default: 4)")
 
+    # Utility: Train Filter
+    p_train = subparsers.add_parser("train-filter", help="Utility: Train custom Linear SVM plant presence filter")
+    p_train.add_argument("--positive-dir", required=True, help="Directory containing images WITH plants")
+    p_train.add_argument("--negative-dir", required=True, help="Directory containing images WITHOUT plants")
+    p_train.add_argument("--output", default="models/plant_filter_svm.joblib", help="Output model path (default: models/plant_filter_svm.joblib)")
+    p_train.add_argument("--c", type=float, default=1.0, help="SVM regularization parameter C (default: 1.0)")
+    p_train.add_argument("--device", default=None, help="Compute device ('mps', 'cuda', 'cpu')")
+
     # All steps
     p_all = subparsers.add_parser("all", help="Run entire pipeline end-to-end")
     p_all.add_argument("--csv-path", default="data/SEHbees/records.csv", help="Path to ALA occurrences CSV")
@@ -100,6 +108,16 @@ def main():
             args.output_dir,
             min_confidence=args.min_confidence,
             round_decimals=args.decimals
+        )
+
+    elif args.command == "train-filter":
+        from pipeline.train_filter import train_filter
+        train_filter(
+            positive_dir=args.positive_dir,
+            negative_dir=args.negative_dir,
+            output_model_path=args.output,
+            c_param=args.c,
+            device=args.device
         )
 
     elif args.command == "all":
