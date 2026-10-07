@@ -7,7 +7,12 @@
 
 Experimental data-mining of bee-plant interactions (visitation) from biodiversity occurrence records. This repository implements an automated computer vision and data mining pipeline that processes occurrence records and photographs from the **Atlas of Living Australia (ALA)** to detect, identify and annotate plants visited by Australian native and introduced bees.
 
-[Anthophiles](https://anthophiles.mtchl.net) demonstrates the results for a dataset of bee occurrences from the South Eastern Highlands bioregion. From c. 16,000 source images it yields around 3,300 high confidence interaction records.
+### Demo & Data
+[Anthophiles](https://anthophiles.mtchl.net) demonstrates the results for a dataset of bee occurrences from the South Eastern Highlands bioregion. From c. 16,000 source images it yields around 3,300 high confidence interaction records. 
+
+Interaction data for this demo is published here as [JSON](seh-bees/seh-bees-plants.json) and [CSV](seh-bees/seh-bees-plants.csv)
+
+
 
 ## Pipeline Overview
 
@@ -192,4 +197,3 @@ Darwin Core and FAIR-aligned format suitable for ecological research, GIS mappin
 - **Atlas of Living Australia (ALA)**: Biodiversity data and images provided under Creative Commons licensing.
 - **BioCLIP 2**: Stevens et al., *BioCLIP: A Vision Foundation Model for the Tree of Life*. [Imageomics Institute](https://imageomics.github.io/bioclip-2/).
 - **MegaDetector**: Beery et al., *MegaDetector for animal detection in camera trap and field imagery*. [AgentMorris / Microsoft AI for Earth](https://github.com/agentmorris/MegaDetector).
-- **Australian Bee Genera**: Taxonomy guided by Tobias Smith, *Australian Bee Genera Key*.
