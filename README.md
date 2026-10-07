@@ -8,9 +8,9 @@
 Experimental data-mining of bee-plant interactions (visitation) from biodiversity occurrence records. This repository implements an automated computer vision and data mining pipeline that processes occurrence records and photographs from the **Atlas of Living Australia (ALA)** to detect, identify and annotate plants visited by Australian native and introduced bees.
 
 ### Demo & Data
-[Anthophiles](https://anthophiles.mtchl.net) demonstrates the results for a dataset of bee occurrences from the South Eastern Highlands bioregion. From c. 16,000 source images it yields around 3,300 high confidence interaction records. 
+[Anthophiles](https://anthophiles.mtchl.net) demonstrates the results for a [dataset](https://doi.org/10.26197/ala.6f6eb117-96d3-4f33-b2bb-1990e6454104) of bee occurrences from the South Eastern Highlands bioregion. From c. 16,000 source images it yields around 3,300 high confidence interaction records. 
 
-Interaction data for this demo is published here as [JSON](seh-bees/seh-bees-plants.json) and [CSV](seh-bees/seh-bees-plants.csv)
+Full interaction data for this demo is included here as [JSON](seh-bees/seh-bees-plants.json) and [CSV](seh-bees/seh-bees-plants.csv)
 
 
 
