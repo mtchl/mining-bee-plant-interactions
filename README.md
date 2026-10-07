@@ -13,16 +13,13 @@ Experimental data-mining of bee-plant interactions (visitation) from biodiversit
 
 ## Pipeline Overview
 
-The pipeline automates the extraction of bee-plant visitation from occurrence records through four sequential stages:
-1. **Harvesting:** Downloads occurrence records and images from the Atlas of Living Australia with polite rate limiting.
+1. **Harvesting:** Downloads occurrence images from the Atlas of Living Australia (one image per record).
 2. **Localization:** Detects animal/bee bounding boxes using MegaDetector (MDV5A).
-3. **Redaction, Filtering & Classification:** Blurs insect bounding boxes to prevent visual interference, evaluates an SVM gate on BioCLIP visual embeddings to ensure an identifiable plant is in frame, classifies the top plant genus with BioCLIP's `Kingdom: Plantae` taxon filter, and queries ALA for empirical nativeness ratios.
-4. **Dual-Mode Export:** Produces lightweight client-side data for web interfaces and rich tabular datasets for research reuse.
+3. **Redaction, Filtering & Classification:** Blurs insect bounding boxes to prevent visual interference, filters out images without a plant in frame, and classifies plant genus with BioCLIP. Optionally, queries the ALA's `establishmentMeans` field to estimate whether the plant genus is native.
+4. **Data Export:** Produces lightweight client-side data for web interfaces and tabular datasets for other applications.
 
 ### Pipeline Stages
 
-1. **Image & Metadata Harvesting (`pipeline/harvest.py`)**  
-   Reads occurrence data exported from ALA, parses canonical image IDs, and downloads images with polite rate limiting and exponential backoff retry logic.
 
 2. **Insect Localization (`pipeline/detect_bees.py`)**  
    Uses **MegaDetector (MDV5A)** batch inference to locate animals/insects within each photograph and save normalized bounding box coordinates.
