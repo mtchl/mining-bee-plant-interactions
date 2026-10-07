@@ -9,8 +9,6 @@ Experimental data-mining of bee-plant interactions (visitation) from biodiversit
 
 [Anthophiles](https://anthophiles.mtchl.net) demonstrates the results for a dataset of bee occurrences from the South Eastern Highlands bioregion. From c. 16,000 source images it yields around 3,300 high confidence interaction records.
 
----
-
 ## Pipeline Overview
 
 1. **Harvesting (`pipeline/harvest.py`):** Downloads occurrence images from the Atlas of Living Australia (one image per record).
@@ -25,10 +23,10 @@ Experimental data-mining of bee-plant interactions (visitation) from biodiversit
    BioCLIP 2 is effective at identifying plants when constrained by a taxonomic filter (`Kingdom: Plantae`). But visual signals from the insect can dominate the embedding and distort classification. Localizing the bee with MegaDetector and applying a   Gaussian blur removes insect visual features and improves plant ID accuracy.
 
 2. **Pre-Filtering Prevents Semantic Hallucinations on Non-Plant Frames**  
-   When an occurrence record depicts a bee without a visible plant, constraining BioCLIP to `Kingdom: Plantae` forces the model to select the nearest plant taxon. This causes false positives due to visual or semantic collisions in BioCLIP. False IDs include the orchid genus *Stelis* (which collides with the bee genus *Stelis* as well as images of observers' hands and fingers) or *Tetradium* (the 'bee bee' tree). To filter out non-plant images a linear classifier was trained on the BioCLIP embeddings for 200 hand-labelled images.
+   When an occurrence record depicts a bee without a visible plant, constraining BioCLIP to `Kingdom: Plantae` forces the model to select the nearest plant taxon. This causes false positives due to visual or semantic collisions in BioCLIP. False IDs include the orchid genus *Stelis* (which collides with the bee genus *Stelis* as well as images of observers' hands and fingers) or *Tetradium* (the 'bee bee' tree). To filter out non-plant images a linear classifier was trained on the BioCLIP embeddings for 100 hand-labelled images.
 
-3. **Genus-Level Classification Strikes the Optimal Balance**  
-   Attempting species-level classification across wild, uncurated field photography resulted in excessive uncertainty and severe bias toward dominant species in the training distribution. Conversely, family-level identification was too coarse to reveal ecologically informative host associations. Classifying plants to **genus level** provides the ideal balance between morphological distinctiveness, classification accuracy, and ecological granularity for Australian flora.
+3. **Genus-Level Classification**  
+   Classifying plants to **genus level** with BioCLIP gave significantly better accuracy than attempting to identify species.
 
 ## Installation
 
