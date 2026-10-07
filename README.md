@@ -41,8 +41,8 @@ Full interaction data for this demo is included here as [JSON](seh-bees/seh-bees
 
 ```bash
 # Clone the repository
-git clone https://github.com/<your-username>/miningRelations.git
-cd miningRelations
+git clone https://github.com/mtchl/mining-bee-plant-interactions.git
+cd mining-bee-plant-interactions
 
 # Create and activate virtual environment
 python3 -m venv .venv
