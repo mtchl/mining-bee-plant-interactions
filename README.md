@@ -67,7 +67,7 @@ python run_pipeline.py all --csv-path sample_data/records.csv --output-dir sampl
 
 ### 2. Run Full Pipeline End-to-End
 ```bash
-python run_pipeline.py all --csv-path data/SEHbees/records.csv --output-dir data/SEHbees
+python run_pipeline.py all --csv-path your-dir/records.csv --output-dir your-dir
 ```
 
 ### 3. Run Individual Steps
@@ -75,39 +75,41 @@ python run_pipeline.py all --csv-path data/SEHbees/records.csv --output-dir data
 #### Step 1: Harvest Images & Build Manifest
 ```bash
 python run_pipeline.py harvest \
-  --csv-path data/SEHbees/records.csv \
-  --output-dir data/SEHbees/images \
-  --manifest-path data/SEHbees/manifest.json \
+  --csv-path your-dir/records.csv \
+  --output-dir your-dir/images \
+  --manifest-path your-dir/manifest.json \
   --delay 0.5
 ```
 
 #### Step 2: MegaDetector Animal Detection
 ```bash
 python run_pipeline.py detect \
-  --image-dir data/SEHbees/images \
-  --output-path data/SEHbees/bbox_detections.json \
+  --image-dir your-dir/images \
+  --output-path your-dir/bbox_detections.json \
   --model MDV5A
 ```
 
 #### Step 3: Redact Bees, Filter Plants & Classify Genera
 ```bash
 python run_pipeline.py classify \
-  --manifest data/SEHbees/manifest.json \
-  --bbox-file data/SEHbees/bbox_detections.json \
-  --images-dir data/SEHbees/images \
+  --manifest your-dir/manifest.json \
+  --bbox-file your-dir/bbox_detections.json \
+  --images-dir your-dir/images \
   --svm-model models/plant_filter_svm.joblib \
   --threshold 0.30 \
-  --output-path data/SEHbees/detections-genus-annotated.json
+  --output-path your-dir/detections-genus-annotated.json
 ```
+`threshold` specifies the filter threshold for the plant / no-plant classifier
 
-#### Step 4: Export Clean Datasets (Web UI & Public Formats)
+#### Step 4: Export Data (Web UI & Public Formats)
 ```bash
 python run_pipeline.py export \
-  --input-json data/SEHbees/detections-genus-annotated.json \
-  --output-dir data/SEHbees \
+  --input-json your-dir/detections-genus-annotated.json \
+  --output-dir your-dir \
   --min-confidence 0.4 \
   --decimals 4
 ```
+`min-confidence` specifies the minimum plant ID score for occurrences to be included in the web UI data export. It has no effect on the public data export. 
 
 #### Training a Custom Plant Filter (Optional)
 The pre-trained model in `models/plant_filter_svm.joblib` was calibrated on Australian bee observations. If you adapt this pipeline to other insect groups (e.g. butterflies, hoverflies) or different photography environments, you can train a domain-specific Linear SVM filter using two folders:
@@ -122,10 +124,33 @@ python run_pipeline.py train-filter \
 
 ---
 
-## Data Output Formats & Data Dictionary
+## Data Outputs
 
-### 1. Web UI Deliverable (`detections-ui.json`)
-Engineered specifically for client-side web applications. Automatically filtered to plant detections with prediction confidence $> 0.4$ (configurable via `--min-confidence`). All local paths, redundant arrays, and unused spatial coordinates are stripped, and floating-point confidence values are rounded to 4 decimals (reducing file size from ~14 MB to **~1.6 MB**):
+### 1. Full data (CSV / JSON)
+
+| Field | Type | Description |
+| :--- | :--- | :--- |
+| `occurrenceID` | string | Unique ALA occurrence UUID |
+| `scientificName` | string | Recorded insect taxon name |
+| `beeGenus` | string | Insect genus |
+| `beeFamily` | string | Insect family |
+| `eventDate` | ISO 8601 | Date and time of observation |
+| `decimalLatitude` | float | WGS84 latitude coordinate |
+| `decimalLongitude` | float | WGS84 longitude coordinate |
+| `imageID` | string | ALA image identifier |
+| `imageUrl` | string | Canonical public image URL (`https://images.ala.org.au/image/{imageID}`) |
+| `dataResourceName` | string | ALA contributing dataset / citizen science provider |
+| `identifiedBy` | string | Observer / identifier credit |
+| `boxesRedacted` | integer | Number of MegaDetector bounding boxes redacted in image |
+| `hasPlant` | boolean | Binary plant presence decision from calibrated SVM gate |
+| `plantFilterConfidence` | float (0–1) | Calibrated probability of plant presence from visual embedding SVM |
+| `plantGenus` | string | Top-ranked plant genus predicted by BioCLIP |
+| `plantGenusScore` | float (0–1) | BioCLIP model prediction confidence |
+| `plantGenusNativeStatus`| float (0–1) | Ratio of ALA Australian records flagged as native vs introduced |
+
+
+### 2. Web UI data (JSON)
+Compact data for client-side web applications. Automatically filtered to plant detections with prediction confidence $> 0.4$ (configurable via `--min-confidence`).
 
 ```json
 {
@@ -147,28 +172,6 @@ Engineered specifically for client-side web applications. Automatically filtered
 }
 ```
 
-### 2. Public Research Deliverable (`detections-public.csv` & `detections-public.json`)
-Darwin Core and FAIR-aligned format suitable for ecological research, GIS mapping, and statistical analysis:
-
-| Field | Type | Description |
-| :--- | :--- | :--- |
-| `occurrenceID` | string | Unique ALA occurrence UUID |
-| `scientificName` | string | Recorded insect taxon name |
-| `beeGenus` | string | Insect genus |
-| `beeFamily` | string | Insect family |
-| `eventDate` | ISO 8601 | Date and time of observation |
-| `decimalLatitude` | float | WGS84 latitude coordinate |
-| `decimalLongitude` | float | WGS84 longitude coordinate |
-| `imageID` | string | ALA image identifier |
-| `imageUrl` | string | Canonical public image URL (`https://images.ala.org.au/image/{imageID}`) |
-| `dataResourceName` | string | ALA contributing dataset / citizen science provider |
-| `identifiedBy` | string | Observer / identifier credit |
-| `boxesRedacted` | integer | Number of MegaDetector bounding boxes redacted in image |
-| `hasPlant` | boolean | Binary plant presence decision from calibrated SVM gate |
-| `plantFilterConfidence` | float (0–1) | Calibrated probability of plant presence from visual embedding SVM |
-| `plantGenus` | string | Top-ranked plant genus predicted by BioCLIP |
-| `plantGenusScore` | float (0–1) | BioCLIP model prediction confidence |
-| `plantGenusNativeStatus`| float (0–1) | Ratio of ALA Australian records flagged as native vs introduced |
 
 ---
 
